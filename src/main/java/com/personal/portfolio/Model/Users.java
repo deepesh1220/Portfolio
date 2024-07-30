@@ -1,14 +1,13 @@
 package com.personal.portfolio.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -25,4 +24,20 @@ public class Users {
     private String password;
     private String bio;
     private String profilePicture;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Project> projects;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Education> educationList;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Experience> experienceList;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Certification> certifications;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Contact> contacts;
+
 }
