@@ -27,6 +27,6 @@ public class UserDTO {
     private List<EducationDTO> educationList;
     private List<ExperienceDTO> experienceList;
     private List<CertificationDTO> certifications;
-    private List<ContactDTO> contact
+    private List<ContactDTO> contact;
 
 }
