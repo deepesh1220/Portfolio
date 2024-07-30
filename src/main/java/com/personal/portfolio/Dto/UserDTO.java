@@ -23,6 +23,10 @@ public class UserDTO {
     private String password;
     private String bio;
     private String profilePicture;
-
+    private List<ProjectDTO> projects;
+    private List<EducationDTO> educationList;
+    private List<ExperienceDTO> experienceList;
+    private List<CertificationDTO> certifications;
+    private List<ContactDTO> contact
 
 }
