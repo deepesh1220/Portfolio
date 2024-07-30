@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     @Autowired
     UserServiceImpl userServiceimpl;
-    public List<Users> getAll(){
-        return userServiceimpl.getUsers();
-    }
+
+
 }
