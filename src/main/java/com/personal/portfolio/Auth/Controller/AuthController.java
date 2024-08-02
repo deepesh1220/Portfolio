@@ -1,10 +1,11 @@
 package com.personal.portfolio.Auth.Controller;
 
-import com.springrest.springrest.Auth.Request.AuthRequest;
-import com.springrest.springrest.Auth.Response.AuthResponse;
-import com.springrest.springrest.Auth.Security.Jwt.JwtUtil;
-import com.springrest.springrest.Model.Users;
-import com.springrest.springrest.Repository.UserRepository;
+
+import com.personal.portfolio.Auth.Request.AuthRequest;
+import com.personal.portfolio.Auth.Response.AuthResponse;
+import com.personal.portfolio.Auth.Security.Jwt.JwtUtil;
+import com.personal.portfolio.Model.Users;
+import com.personal.portfolio.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/public/api")
 public class AuthController {
 
     @Autowired
@@ -60,9 +61,8 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody Users user) {
-        if (userRepository.findByUsername(user.getUsername()) != null) {
+        if (userRepository.findByUsername(user.getUsername()) != null)
             return ResponseEntity.badRequest().body("Username already exists");
-        }
 
         // You may want to hash the password before saving to the database
          user.setPassword(encoder.encode(user.getPassword()));

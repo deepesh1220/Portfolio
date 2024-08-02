@@ -1,6 +1,7 @@
 package com.personal.portfolio.Auth.Security.Filter;
 
-import com.springrest.springrest.Auth.Security.Jwt.JwtUtil;
+
+import com.personal.portfolio.Auth.Security.Jwt.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,8 +1,9 @@
 package com.personal.portfolio.Auth.Service;
 
 
-import com.springrest.springrest.Model.Users;
-import com.springrest.springrest.Repository.UserRepository;
+
+import com.personal.portfolio.Model.Users;
+import com.personal.portfolio.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,7 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return (UserDetails)userRepository.findByUsername(username);
     }
 
     public List<Users> getAllUsers(){
