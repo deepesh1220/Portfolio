@@ -1,8 +1,9 @@
 package com.personal.portfolio.Auth.Security.Config;
 
 
-import com.springrest.springrest.Auth.Security.Filter.JwtRequestFilter;
-import com.springrest.springrest.Auth.Service.UserDetailsServiceImpl;
+
+import com.personal.portfolio.Auth.Security.Filter.JwtRequestFilter;
+import com.personal.portfolio.Auth.Service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,9 +37,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/login", "/api/register", "/actuator/**" ,"/h2-ui/**").permitAll()
-                                .anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/public/**","/api/login", "/api/register", "/actuator/**" ,"/h2-console/**").permitAll()
+                        .anyRequest().authenticated()
                 );
         http.headers(headers -> headers.frameOptions(frameOption -> frameOption.sameOrigin()));
 
