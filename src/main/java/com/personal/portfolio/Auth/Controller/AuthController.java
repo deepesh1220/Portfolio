@@ -4,12 +4,13 @@ package com.personal.portfolio.Auth.Controller;
 import com.personal.portfolio.Auth.Request.AuthRequest;
 import com.personal.portfolio.Auth.Response.AuthResponse;
 import com.personal.portfolio.Auth.Security.Jwt.JwtUtil;
+import com.personal.portfolio.Exception.BadRequestException;
 import com.personal.portfolio.Model.Users;
 import com.personal.portfolio.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +21,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/public/api")
@@ -37,6 +42,8 @@ public class AuthController {
     @Autowired
     PasswordEncoder encoder;
 
+    private final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     public AuthController(AuthenticationManager authenticationManager, UserDetailsService userDetailsService, JwtUtil jwtUtil, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
@@ -49,8 +56,11 @@ public class AuthController {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (BadCredentialsException e) {
+
+        } catch (BadRequestException e) {
+            logger.error("Authentication failed Ho Gya Check The Password: {}", e.getMessage(), e); // Add logging for debugging
             throw new Exception("Incorrect username or password", e);
+//            return new ResponseEntity<>("Incorrect username or password",HttpStatus.BAD_REQUEST);
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());

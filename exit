@@ -1,0 +1,626 @@
+[1mdiff --git a/src/main/java/com/personal/portfolio/Auth/Controller/AuthController.java b/src/main/java/com/personal/portfolio/Auth/Controller/AuthController.java[m
+[1mindex 5efe340..dd5bc6c 100644[m
+[1m--- a/src/main/java/com/personal/portfolio/Auth/Controller/AuthController.java[m
+[1m+++ b/src/main/java/com/personal/portfolio/Auth/Controller/AuthController.java[m
+[36m@@ -7,6 +7,7 @@[m [mimport com.personal.portfolio.Auth.Security.Jwt.JwtUtil;[m
+ import com.personal.portfolio.Model.Users;[m
+ import com.personal.portfolio.Repository.UserRepository;[m
+ import org.springframework.beans.factory.annotation.Autowired;[m
+[32m+[m[32mimport org.springframework.http.HttpStatus;[m
+ import org.springframework.http.ResponseEntity;[m
+ import org.springframework.security.authentication.AuthenticationManager;[m
+ import org.springframework.security.authentication.BadCredentialsException;[m
+[36m@@ -21,6 +22,10 @@[m [mimport org.springframework.web.bind.annotation.RequestBody;[m
+ import org.springframework.web.bind.annotation.RequestMapping;[m
+ import org.springframework.web.bind.annotation.RestController;[m
+ [m
+[32m+[m
+[32m+[m[32mimport org.slf4j.Logger;[m
+[32m+[m[32mimport org.slf4j.LoggerFactory;[m
+[32m+[m
+ @RestController[m
+ @RequestMapping("/public/api")[m
+ public class AuthController {[m
+[36m@@ -37,6 +42,8 @@[m [mpublic class AuthController {[m
+     @Autowired[m
+     PasswordEncoder encoder;[m
+ [m
+[32m+[m[32m    private final Logger logger = LoggerFactory.getLogger(AuthController.class);[m
+[32m+[m
+     public AuthController(AuthenticationManager authenticationManager, UserDetailsService userDetailsService, JwtUtil jwtUtil, UserRepository userRepository) {[m
+         this.authenticationManager = authenticationManager;[m
+         this.userDetailsService = userDetailsService;[m
+[36m@@ -49,8 +56,11 @@[m [mpublic class AuthController {[m
+         try {[m
+             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));[m
+             SecurityContextHolder.getContext().setAuthentication(authentication);[m
+[32m+[m
+         } catch (BadCredentialsException e) {[m
+[32m+[m[32m            logger.error("Authentication failed Ho Gya Check The Password: {}", e.getMessage(), e); // Add logging for debugging[m
+             throw new Exception("Incorrect username or password", e);[m
+[32m+[m[32m//            return new ResponseEntity<>("Incorrect username or password",HttpStatus.BAD_REQUEST);[m
+         }[m
+ [m
+         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Dto/CertificationDTO.java b/src/main/java/com/personal/portfolio/Dto/CertificationDTO.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7f9937b[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Dto/CertificationDTO.java[m
+[36m@@ -0,0 +1,24 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Dto;[m
+[32m+[m
+[32m+[m[32mimport lombok.AccessLevel;[m
+[32m+[m[32mimport lombok.AllArgsConstructor;[m
+[32m+[m[32mimport lombok.Data;[m
+[32m+[m[32mimport lombok.NoArgsConstructor;[m
+[32m+[m[32mimport lombok.experimental.FieldDefaults;[m
+[32m+[m
+[32m+[m[32mimport java.util.Date;[m
+[32m+[m
+[32m+[m
+[32m+[m[32m@AllArgsConstructor[m
+[32m+[m[32m@NoArgsConstructor[m
+[32m+[m[32m@Data[m
+[32m+[m[32m@FieldDefaults(level = AccessLevel.PRIVATE)[m
+[32m+[m[32mpublic class CertificationDTO {[m
+[32m+[m[32m    private Long certificationId;[m
+[32m+[m[32m    private String name;[m
+[32m+[m[32m    private String issuingOrganization;[m
+[32m+[m[32m    private Date issueDate;[m
+[32m+[m[32m    private Date expirationDate;[m
+[32m+[m
+[32m+[m[32m    // Getters and setters[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Dto/ContactDTO.java b/src/main/java/com/personal/portfolio/Dto/ContactDTO.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d0a0d33[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Dto/ContactDTO.java[m
+[36m@@ -0,0 +1,20 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Dto;[m
+[32m+[m
+[32m+[m
+[32m+[m[32mimport lombok.AccessLevel;[m
+[32m+[m[32mimport lombok.AllArgsConstructor;[m
+[32m+[m[32mimport lombok.Data;[m
+[32m+[m[32mimport lombok.NoArgsConstructor;[m
+[32m+[m[32mimport lombok.experimental.FieldDefaults;[m
+[32m+[m
+[32m+[m[32m@AllArgsConstructor[m
+[32m+[m[32m@NoArgsConstructor[m
+[32m+[m[32m@Data[m
+[32m+[m[32m@FieldDefaults(level = AccessLevel.PRIVATE)[m
+[32m+[m[32mpublic class ContactDTO {[m
+[32m+[m[32m    private Long contactId;[m
+[32m+[m[32m    private String contactType;[m
+[32m+[m[32m    private String contactValue;[m
+[32m+[m
+[32m+[m[32m    // Getters and setters[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Dto/EducationDTO.java b/src/main/java/com/personal/portfolio/Dto/EducationDTO.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a1393ac[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Dto/EducationDTO.java[m
+[36m@@ -0,0 +1,24 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Dto;[m
+[32m+[m
+[32m+[m[32mimport lombok.AccessLevel;[m
+[32m+[m[32mimport lombok.AllArgsConstructor;[m
+[32m+[m[32mimport lombok.Data;[m
+[32m+[m[32mimport lombok.NoArgsConstructor;[m
+[32m+[m[32mimport lombok.experimental.FieldDefaults;[m
+[32m+[m
+[32m+[m[32mimport java.util.Date;[m
+[32m+[m
+[32m+[m[32m@AllArgsConstructor[m
+[32m+[m[32m@NoArgsConstructor[m
+[32m+[m[32m@Data[m
+[32m+[m[32m@FieldDefaults(level = AccessLevel.PRIVATE)[m
+[32m+[m[32mpublic class EducationDTO {[m
+[32m+[m[32m    private Long educationId;[m
+[32m+[m[32m    private String institutionName;[m
+[32m+[m[32m    private String degree;[m
+[32m+[m[32m    private String fieldOfStudy;[m
+[32m+[m[32m    private Date startDate;[m
+[32m+[m[32m    private Date endDate;[m
+[32m+[m
+[32m+[m[32m    // Getters and setters[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Dto/ExperienceDTO.java b/src/main/java/com/personal/portfolio/Dto/ExperienceDTO.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3e65dd3[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Dto/ExperienceDTO.java[m
+[36m@@ -0,0 +1,24 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Dto;[m
+[32m+[m
+[32m+[m[32mimport lombok.AccessLevel;[m
+[32m+[m[32mimport lombok.AllArgsConstructor;[m
+[32m+[m[32mimport lombok.Data;[m
+[32m+[m[32mimport lombok.NoArgsConstructor;[m
+[32m+[m[32mimport lombok.experimental.FieldDefaults;[m
+[32m+[m
+[32m+[m[32mimport java.util.Date;[m
+[32m+[m
+[32m+[m[32m@AllArgsConstructor[m
+[32m+[m[32m@NoArgsConstructor[m
+[32m+[m[32m@Data[m
+[32m+[m[32m@FieldDefaults(level = AccessLevel.PRIVATE)[m
+[32m+[m[32mpublic class ExperienceDTO {[m
+[32m+[m[32m    private Long experienceId;[m
+[32m+[m[32m    private String companyName;[m
+[32m+[m[32m    private String position;[m
+[32m+[m[32m    private Date startDate;[m
+[32m+[m[32m    private Date endDate;[m
+[32m+[m[32m    private String description;[m
+[32m+[m
+[32m+[m[32m    // Getters and setters[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Dto/ProjectDTO.java b/src/main/java/com/personal/portfolio/Dto/ProjectDTO.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..992891e[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Dto/ProjectDTO.java[m
+[36m@@ -0,0 +1,27 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Dto;[m
+[32m+[m
+[32m+[m[32mimport lombok.AccessLevel;[m
+[32m+[m[32mimport lombok.AllArgsConstructor;[m
+[32m+[m[32mimport lombok.Data;[m
+[32m+[m[32mimport lombok.NoArgsConstructor;[m
+[32m+[m[32mimport lombok.experimental.FieldDefaults;[m
+[32m+[m
+[32m+[m[32mimport java.util.Date;[m
+[32m+[m[32mimport java.util.List;[m
+[32m+[m
+[32m+[m[32m@AllArgsConstructor[m
+[32m+[m[32m@NoArgsConstructor[m
+[32m+[m[32m@Data[m
+[32m+[m[32m@FieldDefaults(level = AccessLevel.PRIVATE)[m
+[32m+[m[32mpublic class ProjectDTO {[m
+[32m+[m[32m    private Long projectId;[m
+[32m+[m[32m    private String title;[m
+[32m+[m[32m    private String description;[m
+[32m+[m[32m    private Date startDate;[m
+[32m+[m[32m    private Date endDate;[m
+[32m+[m[32m    private String projectUrl;[m
+[32m+[m[32m    private String repositoryUrl;[m
+[32m+[m[32m    private List<SkillDTO> skills;[m
+[32m+[m
+[32m+[m[32m    // Getters and setters[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Dto/SkillDTO.java b/src/main/java/com/personal/portfolio/Dto/SkillDTO.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4689128[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Dto/SkillDTO.java[m
+[36m@@ -0,0 +1,20 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Dto;[m
+[32m+[m
+[32m+[m
+[32m+[m[32mimport lombok.AccessLevel;[m
+[32m+[m[32mimport lombok.AllArgsConstructor;[m
+[32m+[m[32mimport lombok.Data;[m
+[32m+[m[32mimport lombok.NoArgsConstructor;[m
+[32m+[m[32mimport lombok.experimental.FieldDefaults;[m
+[32m+[m
+[32m+[m[32m@AllArgsConstructor[m
+[32m+[m[32m@NoArgsConstructor[m
+[32m+[m[32m@Data[m
+[32m+[m[32m@FieldDefaults(level = AccessLevel.PRIVATE)[m
+[32m+[m[32mpublic class SkillDTO {[m
+[32m+[m[32m    private Long skillId;[m
+[32m+[m[32m    private String name;[m
+[32m+[m[32m    private String category;[m
+[32m+[m
+[32m+[m[32m    // Getters and setters[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Dto/UserDTO.java b/src/main/java/com/personal/portfolio/Dto/UserDTO.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..55f5d7d[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Dto/UserDTO.java[m
+[36m@@ -0,0 +1,28 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Dto;[m
+[32m+[m
+[32m+[m[32mimport lombok.AccessLevel;[m
+[32m+[m[32mimport lombok.AllArgsConstructor;[m
+[32m+[m[32mimport lombok.Data;[m
+[32m+[m[32mimport lombok.NoArgsConstructor;[m
+[32m+[m[32mimport lombok.experimental.FieldDefaults;[m
+[32m+[m
+[32m+[m[32mimport java.util.List;[m
+[32m+[m
+[32m+[m[32m@AllArgsConstructor[m
+[32m+[m[32m@NoArgsConstructor[m
+[32m+[m[32m@Data[m
+[32m+[m[32m@FieldDefaults(level = AccessLevel.PRIVATE)[m
+[32m+[m[32mpublic class UserDTO {[m
+[32m+[m[32m    private Long userId;[m
+[32m+[m[32m    private String name;[m
+[32m+[m[32m    private String email;[m
+[32m+[m[32m    private String bio;[m
+[32m+[m[32m    private String profilePicture;[m
+[32m+[m[32m    private List<ProjectDTO> projects;[m
+[32m+[m[32m    private List<EducationDTO> educationList;[m
+[32m+[m[32m    private List<ExperienceDTO> experienceList;[m
+[32m+[m[32m    private List<CertificationDTO> certifications;[m
+[32m+[m[32m    private List<ContactDTO> contacts;[m
+[32m+[m
+[32m+[m[32m    // Getters and setters[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Mapper/CertificationMapper.java b/src/main/java/com/personal/portfolio/Mapper/CertificationMapper.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4cc4218[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Mapper/CertificationMapper.java[m
+[36m@@ -0,0 +1,28 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Mapper;[m
+[32m+[m
+[32m+[m
+[32m+[m[32mimport com.personal.portfolio.Dto.CertificationDTO;[m
+[32m+[m[32mimport com.personal.portfolio.Model.Certification;[m
+[32m+[m
+[32m+[m[32mpublic class CertificationMapper {[m
+[32m+[m
+[32m+[m[32m    public static CertificationDTO toDTO(Certification certification) {[m
+[32m+[m[32m        CertificationDTO dto = new CertificationDTO();[m
+[32m+[m[32m        dto.setCertificationId(certification.getCertificationId());[m
+[32m+[m[32m        dto.setName(certification.getName());[m
+[32m+[m[32m        dto.setIssuingOrganization(certification.getIssuingOrganization());[m
+[32m+[m[32m        dto.setIssueDate(certification.getIssueDate());[m
+[32m+[m[32m        dto.setExpirationDate(certification.getExpirationDate());[m
+[32m+[m[32m        return dto;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public static Certification toEntity(CertificationDTO dto) {[m
+[32m+[m[32m        Certification certification = new Certification();[m
+[32m+[m[32m        certification.setCertificationId(dto.getCertificationId());[m
+[32m+[m[32m        certification.setName(dto.getName());[m
+[32m+[m[32m        certification.setIssuingOrganization(dto.getIssuingOrganization());[m
+[32m+[m[32m        certification.setIssueDate(dto.getIssueDate());[m
+[32m+[m[32m        certification.setExpirationDate(dto.getExpirationDate());[m
+[32m+[m[32m        return certification;[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Mapper/ContactMapper.java b/src/main/java/com/personal/portfolio/Mapper/ContactMapper.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..dae9ca7[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Mapper/ContactMapper.java[m
+[36m@@ -0,0 +1,24 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Mapper;[m
+[32m+[m
+[32m+[m
+[32m+[m[32mimport com.personal.portfolio.Dto.ContactDTO;[m
+[32m+[m[32mimport com.personal.portfolio.Model.Contact;[m
+[32m+[m
+[32m+[m[32mpublic class ContactMapper {[m
+[32m+[m
+[32m+[m[32m    public static ContactDTO toDTO(Contact contact) {[m
+[32m+[m[32m        ContactDTO dto = new ContactDTO();[m
+[32m+[m[32m        dto.setContactId(contact.getContactId());[m
+[32m+[m[32m        dto.setContactType(contact.getContactType());[m
+[32m+[m[32m        dto.setContactValue(contact.getContactValue());[m
+[32m+[m[32m        return dto;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public static Contact toEntity(ContactDTO dto) {[m
+[32m+[m[32m        Contact contact = new Contact();[m
+[32m+[m[32m        contact.setContactId(dto.getContactId());[m
+[32m+[m[32m        contact.setContactType(dto.getContactType());[m
+[32m+[m[32m        contact.setContactValue(dto.getContactValue());[m
+[32m+[m[32m        return contact;[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Mapper/EducationMapper.java b/src/main/java/com/personal/portfolio/Mapper/EducationMapper.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..afcc965[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Mapper/EducationMapper.java[m
+[36m@@ -0,0 +1,30 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Mapper;[m
+[32m+[m
+[32m+[m
+[32m+[m[32mimport com.personal.portfolio.Dto.EducationDTO;[m
+[32m+[m[32mimport com.personal.portfolio.Model.Education;[m
+[32m+[m
+[32m+[m[32mpublic class EducationMapper {[m
+[32m+[m
+[32m+[m[32m    public static EducationDTO toDTO(Education education) {[m
+[32m+[m[32m        EducationDTO dto = new EducationDTO();[m
+[32m+[m[32m        dto.setEducationId(education.getEducationId());[m
+[32m+[m[32m        dto.setInstitutionName(education.getInstitutionName());[m
+[32m+[m[32m        dto.setDegree(education.getDegree());[m
+[32m+[m[32m        dto.setFieldOfStudy(education.getFieldOfStudy());[m
+[32m+[m[32m        dto.setStartDate(education.getStartDate());[m
+[32m+[m[32m        dto.setEndDate(education.getEndDate());[m
+[32m+[m[32m        return dto;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public static Education toEntity(EducationDTO dto) {[m
+[32m+[m[32m        Education education = new Education();[m
+[32m+[m[32m        education.setEducationId(dto.getEducationId());[m
+[32m+[m[32m        education.setInstitutionName(dto.getInstitutionName());[m
+[32m+[m[32m        education.setDegree(dto.getDegree());[m
+[32m+[m[32m        education.setFieldOfStudy(dto.getFieldOfStudy());[m
+[32m+[m[32m        education.setStartDate(dto.getStartDate());[m
+[32m+[m[32m        education.setEndDate(dto.getEndDate());[m
+[32m+[m[32m        return education;[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Mapper/ExperienceMapper.java b/src/main/java/com/personal/portfolio/Mapper/ExperienceMapper.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..9d677f1[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Mapper/ExperienceMapper.java[m
+[36m@@ -0,0 +1,30 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Mapper;[m
+[32m+[m
+[32m+[m
+[32m+[m[32mimport com.personal.portfolio.Dto.ExperienceDTO;[m
+[32m+[m[32mimport com.personal.portfolio.Model.Experience;[m
+[32m+[m
+[32m+[m[32mpublic class ExperienceMapper {[m
+[32m+[m
+[32m+[m[32m    public static ExperienceDTO toDTO(Experience experience) {[m
+[32m+[m[32m        ExperienceDTO dto = new ExperienceDTO();[m
+[32m+[m[32m        dto.setExperienceId(experience.getExperienceId());[m
+[32m+[m[32m        dto.setCompanyName(experience.getCompanyName());[m
+[32m+[m[32m        dto.setPosition(experience.getPosition());[m
+[32m+[m[32m        dto.setStartDate(experience.getStartDate());[m
+[32m+[m[32m        dto.setEndDate(experience.getEndDate());[m
+[32m+[m[32m        dto.setDescription(experience.getDescription());[m
+[32m+[m[32m        return dto;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public static Experience toEntity(ExperienceDTO dto) {[m
+[32m+[m[32m        Experience experience = new Experience();[m
+[32m+[m[32m        experience.setExperienceId(dto.getExperienceId());[m
+[32m+[m[32m        experience.setCompanyName(dto.getCompanyName());[m
+[32m+[m[32m        experience.setPosition(dto.getPosition());[m
+[32m+[m[32m        experience.setStartDate(dto.getStartDate());[m
+[32m+[m[32m        experience.setEndDate(dto.getEndDate());[m
+[32m+[m[32m        experience.setDescription(dto.getDescription());[m
+[32m+[m[32m        return experience;[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Mapper/ProjectMapper.java b/src/main/java/com/personal/portfolio/Mapper/ProjectMapper.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..cb5fffe[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Mapper/ProjectMapper.java[m
+[36m@@ -0,0 +1,37 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Mapper;[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32mimport com.personal.portfolio.Dto.ProjectDTO;[m
+[32m+[m[32mimport com.personal.portfolio.Model.Project;[m
+[32m+[m
+[32m+[m[32mimport java.util.stream.Collectors;[m
+[32m+[m
+[32m+[m[32mpublic class ProjectMapper {[m
+[32m+[m
+[32m+[m[32m    public static ProjectDTO toDTO(Project project) {[m
+[32m+[m[32m        ProjectDTO dto = new ProjectDTO();[m
+[32m+[m[32m        dto.setProjectId(project.getProjectId());[m
+[32m+[m[32m        dto.setTitle(project.getTitle());[m
+[32m+[m[32m        dto.setDescription(project.getDescription());[m
+[32m+[m[32m        dto.setStartDate(project.getStartDate());[m
+[32m+[m[32m        dto.setEndDate(project.getEndDate());[m
+[32m+[m[32m        dto.setProjectUrl(project.getProjectUrl());[m
+[32m+[m[32m        dto.setRepositoryUrl(project.getRepositoryUrl());[m
+[32m+[m[32m        dto.setSkills(project.getSkills().stream().map(SkillMapper::toDTO).collect(Collectors.toList()));[m
+[32m+[m[32m        return dto;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public static Project toEntity(ProjectDTO dto) {[m
+[32m+[m[32m        Project project = new Project();[m
+[32m+[m[32m        project.setProjectId(dto.getProjectId());[m
+[32m+[m[32m        project.setTitle(dto.getTitle());[m
+[32m+[m[32m        project.setDescription(dto.getDescription());[m
+[32m+[m[32m        project.setStartDate(dto.getStartDate());[m
+[32m+[m[32m        project.setEndDate(dto.getEndDate());[m
+[32m+[m[32m        project.setProjectUrl(dto.getProjectUrl());[m
+[32m+[m[32m        project.setRepositoryUrl(dto.getRepositoryUrl());[m
+[32m+[m[32m        // Handle setting skills if necessary[m
+[32m+[m[32m        return project;[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Mapper/SkillMapper.java b/src/main/java/com/personal/portfolio/Mapper/SkillMapper.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4aca6b7[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Mapper/SkillMapper.java[m
+[36m@@ -0,0 +1,24 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Mapper;[m
+[32m+[m
+[32m+[m
+[32m+[m[32mimport com.personal.portfolio.Dto.SkillDTO;[m
+[32m+[m[32mimport com.personal.portfolio.Model.Skill;[m
+[32m+[m
+[32m+[m[32mpublic class SkillMapper {[m
+[32m+[m
+[32m+[m[32m    public static SkillDTO toDTO(Skill skill) {[m
+[32m+[m[32m        SkillDTO dto = new SkillDTO();[m
+[32m+[m[32m        dto.setSkillId(skill.getSkillId());[m
+[32m+[m[32m        dto.setName(skill.getName());[m
+[32m+[m[32m        dto.setCategory(skill.getCategory());[m
+[32m+[m[32m        return dto;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public static Skill toEntity(SkillDTO dto) {[m
+[32m+[m[32m        Skill skill = new Skill();[m
+[32m+[m[32m        skill.setSkillId(dto.getSkillId());[m
+[32m+[m[32m        skill.setName(dto.getName());[m
+[32m+[m[32m        skill.setCategory(dto.getCategory());[m
+[32m+[m[32m        return skill;[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Mapper/UserMapper.java b/src/main/java/com/personal/portfolio/Mapper/UserMapper.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..55ddd4c[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/com/personal/portfolio/Mapper/UserMapper.java[m
+[36m@@ -0,0 +1,37 @@[m
+[32m+[m[32mpackage com.personal.portfolio.Mapper;[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32mimport com.personal.portfolio.Dto.UserDTO;[m
+[32m+[m[32mimport com.personal.portfolio.Model.Users;[m
+[32m+[m
+[32m+[m[32mimport java.util.stream.Collectors;[m
+[32m+[m
+[32m+[m[32mpublic class UserMapper {[m
+[32m+[m
+[32m+[m[32m    public static UserDTO toDTO(Users user) {[m
+[32m+[m[32m        UserDTO dto = new UserDTO();[m
+[32m+[m[32m        dto.setUserId(user.getUserId());[m
+[32m+[m[32m        dto.setName(user.getName());[m
+[32m+[m[32m        dto.setEmail(user.getEmail());[m
+[32m+[m[32m        dto.setBio(user.getBio());[m
+[32m+[m[32m        dto.setProfilePicture(user.getProfilePicture());[m
+[32m+[m[32m        dto.setProjects(user.getProjects().stream().map(ProjectMapper::toDTO).collect(Collectors.toList()));[m
+[32m+[m[32m        dto.setEducationList(user.getEducationList().stream().map(EducationMapper::toDTO).collect(Collectors.toList()));[m
+[32m+[m[32m        dto.setExperienceList(user.getExperienceList().stream().map(ExperienceMapper::toDTO).collect(Collectors.toList()));[m
+[32m+[m[32m        dto.setCertifications(user.getCertifications().stream().map(CertificationMapper::toDTO).collect(Collectors.toList()));[m
+[32m+[m[32m        dto.setContacts(user.getContacts().stream().map(ContactMapper::toDTO).collect(Collectors.toList()));[m
+[32m+[m[32m        return dto;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public static Users toEntity(UserDTO dto) {[m
+[32m+[m[32m        Users user = new Users();[m
+[32m+[m[32m        user.setUserId(dto.getUserId());[m
+[32m+[m[32m        user.setName(dto.getName());[m
+[32m+[m[32m        user.setEmail(dto.getEmail());[m
+[32m+[m[32m        user.setBio(dto.getBio());[m
+[32m+[m[32m        user.setProfilePicture(dto.getProfilePicture());[m
+[32m+[m[32m        // Handle setting projects, education, experience, certifications, and contacts if necessary[m
+[32m+[m[32m        return user;[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Model/Users.java b/src/main/java/com/personal/portfolio/Model/Users.java[m
+[1mindex cadff28..ed7738d 100644[m
+[1m--- a/src/main/java/com/personal/portfolio/Model/Users.java[m
+[1m+++ b/src/main/java/com/personal/portfolio/Model/Users.java[m
+[36m@@ -52,21 +52,25 @@[m [mpublic class Users implements UserDetails {[m
+ [m
+     @Override[m
+     public boolean isAccountNonExpired() {[m
+[31m-        return UserDetails.super.isAccountNonExpired();[m
+[32m+[m[32m//        return UserDetails.super.isAccountNonExpired();[m
+[32m+[m[32m        return true;[m
+     }[m
+ [m
+     @Override[m
+     public boolean isAccountNonLocked() {[m
+[31m-        return UserDetails.super.isAccountNonLocked();[m
+[32m+[m[32m//        return UserDetails.super.isAccountNonLocked();[m
+[32m+[m[32m        return true;[m
+     }[m
+ [m
+     @Override[m
+     public boolean isCredentialsNonExpired() {[m
+[31m-        return UserDetails.super.isCredentialsNonExpired();[m
+[32m+[m[32m//        return UserDetails.super.isCredentialsNonExpired();[m
+[32m+[m[32m        return true;[m
+     }[m
+ [m
+     @Override[m
+     public boolean isEnabled() {[m
+[31m-        return UserDetails.super.isEnabled();[m
+[32m+[m[32m//        return UserDetails.super.isEnabled();[m
+[32m+[m[32m        return true;[m
+     }[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/PortfolioApplication.java b/src/main/java/com/personal/portfolio/PortfolioApplication.java[m
+[1mindex 38be95e..6caecf8 100644[m
+[1m--- a/src/main/java/com/personal/portfolio/PortfolioApplication.java[m
+[1m+++ b/src/main/java/com/personal/portfolio/PortfolioApplication.java[m
+[36m@@ -8,7 +8,5 @@[m [mpublic class PortfolioApplication {[m
+ [m
+ 	public static void main(String[] args) {[m
+ 		SpringApplication.run(PortfolioApplication.class, args);[m
+[31m-		System.out.println("******************Program Started*******************");[m
+ 	}[m
+[31m-[m
+ }[m
+[1mdiff --git a/src/main/java/com/personal/portfolio/Service/impl/UserServiceImpl.java b/src/main/java/com/personal/portfolio/Service/impl/UserServiceImpl.java[m
+[1mindex e7c9366..6f28e0c 100644[m
+[1m--- a/src/main/java/com/personal/portfolio/Service/impl/UserServiceImpl.java[m
+[1m+++ b/src/main/java/com/personal/portfolio/Service/impl/UserServiceImpl.java[m
+[36m@@ -1,16 +1,6 @@[m
+ package com.personal.portfolio.Service.impl;[m
+ [m
+[31m-import com.personal.portfolio.Model.Users;[m
+[31m-import com.personal.portfolio.Repository.UserRepository;[m
+ import com.personal.portfolio.Service.inter.UserService;[m
+[31m-import org.hibernate.mapping.List;[m
+[31m-import org.springframework.beans.factory.annotation.Autowired;[m
+[31m-import org.springframework.stereotype.Service;[m
+ [m
+[31m-@Service[m
+ public class UserServiceImpl implements UserService {[m
+[31m-[m
+[31m-    @Autowired[m
+[31m-    UserRepository userRepository;[m
+[31m-[m
+ }[m
+[1mdiff --git a/src/main/resources/application.properties b/src/main/resources/application.properties[m
+[1mindex 1d4e5f6..213e1c6 100644[m
+[1m--- a/src/main/resources/application.properties[m
+[1m+++ b/src/main/resources/application.properties[m
+[36m@@ -1,18 +1,42 @@[m
+[32m+[m[32m#spring.application.name=portfolio[m
+[32m+[m[32m## H2 Database configuration[m
+[32m+[m[32m#spring.datasource.url=jdbc:h2:mem:protfoliodb[m
+[32m+[m[32m#spring.datasource.driver-class-name=org.h2.Driver[m
+[32m+[m[32m#spring.datasource.username=sa[m
+[32m+[m[32m#spring.datasource.password=[m
+[32m+[m[32m#spring.jpa.database-platform=org.hibernate.dialect.H2Dialect[m
+[32m+[m[32m#[m
+[32m+[m[32m## H2 Console configuration[m
+[32m+[m[32m#spring.h2.console.enabled=true[m
+[32m+[m[32m#spring.h2.console.path=/h2-console[m
+[32m+[m[32m#[m
+[32m+[m[32m##Jwt[m
+[32m+[m[32m#app.jwt.secret= ======================MySecretKey=TestKey123======================================================[m
+[32m+[m[32m#app.jwt.expiration=36000[m
+[32m+[m[32m#[m
+[32m+[m[32m#server.port=8083[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+ spring.application.name=portfolio[m
+[31m-# H2 Database configuration[m
+[31m-spring.datasource.url=jdbc:h2:mem:protfoliodb[m
+[32m+[m
+[32m+[m[32m# H2 Database configuration - file-based[m
+[32m+[m[32mspring.datasource.url=jdbc:h2:file:./data/c;DB_CLOSE_ON_EXIT=FALSE;[m
+ spring.datasource.driver-class-name=org.h2.Driver[m
+ spring.datasource.username=sa[m
+ spring.datasource.password=[m
+[31m-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect[m
+[32m+[m[32m#spring.jpa.database-platform=org.hibernate.dialect.H2Dialect[m
+[32m+[m[32mspring.datasource.schema=classpath:schema.sql[m
+[32m+[m[32mspring.datasource.data=classpath:data.sql[m
+[32m+[m[32mspring.jpa.hibernate.ddl-auto=update[m
+ [m
+ # H2 Console configuration[m
+ spring.h2.console.enabled=true[m
+ spring.h2.console.path=/h2-console[m
+ [m
+[31m-[m
+[31m-#Jwt[m
+[32m+[m[32m# JWT configuration[m
+ app.jwt.secret= ======================MySecretKey=TestKey123======================================================[m
+[31m-app.jwt.expiration=3600[m
+[32m+[m[32mapp.jwt.expiration=36000[m
+ [m
+ server.port=8083[m
