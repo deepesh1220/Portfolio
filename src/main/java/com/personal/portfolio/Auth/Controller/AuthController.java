@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,23 +52,65 @@ public class AuthController {
         this.userRepository = userRepository;
     }
 
+//    @PostMapping("/login")
+//    public ResponseEntity<?> authenticate(@RequestBody AuthRequest authRequest) throws Exception {
+//        try {
+//            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//        } catch (BadRequestException e) {
+//            logger.error("Authentication failed Ho Gya Check The Password: {}", e.getMessage(), e); // Add logging for debugging
+//            throw new Exception("Incorrect username or password", e);
+////            return new ResponseEntity<>("Incorrect username or password",HttpStatus.BAD_REQUEST);
+//        }
+//
+//        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+//        final String jwt = jwtUtil.generateToken(userDetails);
+//
+//        return ResponseEntity.ok(new AuthResponse(jwt));
+//    }
+
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody AuthRequest authRequest) throws Exception {
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+            );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        } catch (BadRequestException e) {
-            logger.error("Authentication failed Ho Gya Check The Password: {}", e.getMessage(), e); // Add logging for debugging
-            throw new Exception("Incorrect username or password", e);
-//            return new ResponseEntity<>("Incorrect username or password",HttpStatus.BAD_REQUEST);
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+            // Check if the account is enabled, not locked, etc.
+            if (!userDetails.isAccountNonLocked()) {
+                return ResponseEntity.status(HttpStatus.LOCKED).body("Account is locked");
+            }
+            if (!userDetails.isAccountNonExpired()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account is expired");
+            }
+            if (!userDetails.isCredentialsNonExpired()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credentials are expired");
+            }
+            if (!userDetails.isEnabled()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account is not enabled");
+            }
+
+            // Generate JWT token if everything is fine
+            final String jwt = jwtUtil.generateToken(userDetails);
+            return ResponseEntity.ok(new AuthResponse(jwt));
+
+        } catch (BadCredentialsException e) {
+            logger.error("Authentication failed: Incorrect username or password", e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect username or password");
+        } catch (Exception e) {
+            logger.error("Authentication failed: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during authentication");
         }
-
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-        final String jwt = jwtUtil.generateToken(userDetails);
-
-        return ResponseEntity.ok(new AuthResponse(jwt));
     }
+
+
+
+
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody Users user) {

@@ -34,4 +34,5 @@ public class UserMapper {
         // Handle setting projects, education, experience, certifications, and contacts if necessary
         return user;
     }
+
 }
