@@ -22,6 +22,4 @@ public class ProjectDTO {
     private String projectUrl;
     private String repositoryUrl;
     private List<SkillDTO> skills;
-
-    // Getters and setters
 }

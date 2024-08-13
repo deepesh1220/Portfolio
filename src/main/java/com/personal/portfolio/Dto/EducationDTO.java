@@ -19,6 +19,4 @@ public class EducationDTO {
     private String fieldOfStudy;
     private Date startDate;
     private Date endDate;
-
-    // Getters and setters
 }

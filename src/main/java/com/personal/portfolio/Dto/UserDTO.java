@@ -1,5 +1,6 @@
 package com.personal.portfolio.Dto;
 
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class UserDTO {
     private Long userId;
     private String name;
     private String email;
+    private String password;
     private String bio;
     private String profilePicture;
     private List<ProjectDTO> projects;
@@ -23,6 +25,4 @@ public class UserDTO {
     private List<ExperienceDTO> experienceList;
     private List<CertificationDTO> certifications;
     private List<ContactDTO> contacts;
-
-    // Getters and setters
 }

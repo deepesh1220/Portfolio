@@ -1,6 +1,4 @@
 package com.personal.portfolio.Dto;
-
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

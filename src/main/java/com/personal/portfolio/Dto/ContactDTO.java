@@ -1,6 +1,5 @@
 package com.personal.portfolio.Dto;
 
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +14,4 @@ public class ContactDTO {
     private Long contactId;
     private String contactType;
     private String contactValue;
-
-    // Getters and setters
 }
