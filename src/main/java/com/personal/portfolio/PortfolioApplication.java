@@ -10,5 +10,4 @@ public class PortfolioApplication {
 		SpringApplication.run(PortfolioApplication.class, args);
 		System.out.println("******************Program Started*******************");
 	}
-
 }
