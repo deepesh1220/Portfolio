@@ -5,8 +5,10 @@ import com.personal.portfolio.Auth.Request.AuthRequest;
 import com.personal.portfolio.Auth.Response.AuthResponse;
 import com.personal.portfolio.Auth.Security.Jwt.JwtUtil;
 import com.personal.portfolio.Exception.BadRequestException;
+import com.personal.portfolio.Model.RefreshToken;
 import com.personal.portfolio.Model.Users;
 import com.personal.portfolio.Repository.UserRepository;
+import com.personal.portfolio.Service.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+
 @RestController
 @RequestMapping("/public/api")
 public class AuthController {
@@ -39,6 +43,9 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     @Autowired
     private final UserRepository userRepository;
+
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     @Autowired
     PasswordEncoder encoder;
@@ -95,9 +102,10 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account is not enabled");
             }
 
-            // Generate JWT token if everything is fine
-            final String jwt = jwtUtil.generateToken(userDetails);
-            return ResponseEntity.ok(new AuthResponse(jwt));
+            // Generate Access And Refresh token if everything is fine
+            final String accessToken = jwtUtil.generateAccessToken(userDetails);
+            final RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
+            return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken.getToken()));
 
         } catch (BadCredentialsException e) {
             logger.error("Authentication failed: Incorrect username or password", e);
@@ -123,5 +131,36 @@ public class AuthController {
         userRepository.save(user);
         return ResponseEntity.ok("Registration successful");
     }
+
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody AuthRequest authRequest){
+        String requestRefreshToken = authRequest.getRefreshToken();
+
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshToken -> {
+                    if(refreshToken.getExpiryDate().before(new Date())){
+                        refreshTokenService.deleteByToken(refreshToken.getToken());
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Refresh token is expired");
+                    }
+
+                    // Load the user by username associated with the refresh token
+                    Users user = refreshToken.getUser();
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+
+                    String accessToken = jwtUtil.generateAccessToken(userDetails);
+                    return ResponseEntity.ok(new AuthResponse(accessToken, requestRefreshToken));
+                })
+                .orElseGet(()-> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token"));
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody AuthRequest authRequest){
+        refreshTokenService.deleteByToken(authRequest.getRefreshToken());
+        return ResponseEntity.ok("Logged out successfully");
+    }
+
+
 }
 
