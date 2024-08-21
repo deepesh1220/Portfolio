@@ -1,9 +1,8 @@
 package com.personal.portfolio.Controller;
 
-import com.personal.portfolio.Auth.Request.AuthRequest;
 import com.personal.portfolio.Auth.Service.UserDetailsServiceImpl;
 import com.personal.portfolio.Dto.UserDTO;
-import com.personal.portfolio.Service.RefreshTokenService;
+import com.personal.portfolio.Auth.Service.RefreshTokenService;
 import com.personal.portfolio.Service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

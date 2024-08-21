@@ -1,4 +1,4 @@
-package com.personal.portfolio.Repository;
+package com.personal.portfolio.Auth;
 
 import com.personal.portfolio.Model.RefreshToken;
 import com.personal.portfolio.Model.Users;

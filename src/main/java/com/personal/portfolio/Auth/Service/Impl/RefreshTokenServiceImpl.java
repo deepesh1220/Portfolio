@@ -1,11 +1,11 @@
-package com.personal.portfolio.Service.impl;
+package com.personal.portfolio.Auth.Service.Impl;
 
 import com.personal.portfolio.Auth.Security.Jwt.JwtUtil;
 import com.personal.portfolio.Model.RefreshToken;
 import com.personal.portfolio.Model.Users;
-import com.personal.portfolio.Repository.RefreshTokenRepository;
+import com.personal.portfolio.Auth.RefreshTokenRepository;
 import com.personal.portfolio.Repository.UserRepository;
-import com.personal.portfolio.Service.RefreshTokenService;
+import com.personal.portfolio.Auth.Service.RefreshTokenService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
