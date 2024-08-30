@@ -24,7 +24,7 @@ public class UserServiceImpl implements UsersService {
     }
 
     @Override
-    public Object deleteUserById(long id) {
+    public String deleteUserById(long id) {
         userRepository.deleteById(id);
         return "User has been deleted";
     }

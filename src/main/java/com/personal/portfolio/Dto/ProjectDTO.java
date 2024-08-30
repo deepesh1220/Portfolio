@@ -1,9 +1,6 @@
 package com.personal.portfolio.Dto;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
@@ -13,8 +10,9 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class ProjectDTO {
-//    Long projectId;
+    Long projectId;
     String title;
     String description;
     Date startDate;

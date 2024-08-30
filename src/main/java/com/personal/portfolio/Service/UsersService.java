@@ -8,5 +8,5 @@ import org.springframework.stereotype.Service;
 public interface UsersService {
     UserDTO getUserById(long id);
 
-    Object deleteUserById(long id);
+    String deleteUserById(long id);
 }
