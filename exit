@@ -559,7 +559,7 @@
  [m
 [31m-import com.personal.portfolio.Model.Users;[m
 [31m-import com.personal.portfolio.Repository.UserRepository;[m
- import com.personal.portfolio.Service.inter.UserService;[m
+ import com.personal.portfolio.Service.UsersService;[m
 [31m-import org.hibernate.mapping.List;[m
 [31m-import org.springframework.beans.factory.annotation.Autowired;[m
 [31m-import org.springframework.stereotype.Service;[m

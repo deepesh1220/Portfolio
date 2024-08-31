@@ -33,12 +33,24 @@ public class SecurityConfig {
     }
 
 
+    public static final String[] public_urls = {
+            "/public/**",
+            "/api/login",
+            "/api/register",
+            "/actuator/**",
+            "/h2-console/**",
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/webjars/**"
+    };
+
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**","/api/login", "/api/register", "/actuator/**" ,"/h2-console/**").permitAll()
+                        .requestMatchers(public_urls).permitAll()
                         .anyRequest().authenticated()
                 );
         http.headers(headers -> headers.frameOptions(frameOption -> frameOption.sameOrigin()));

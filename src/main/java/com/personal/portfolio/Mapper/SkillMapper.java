@@ -7,6 +7,9 @@ import com.personal.portfolio.Model.Skill;
 public class SkillMapper {
 
     public static SkillDTO toDTO(Skill skill) {
+        if (skill == null) {
+            return null;
+        }
         SkillDTO dto = new SkillDTO();
         dto.setSkillId(skill.getSkillId());
         dto.setName(skill.getName());
@@ -15,6 +18,9 @@ public class SkillMapper {
     }
 
     public static Skill toEntity(SkillDTO dto) {
+        if (dto == null) {
+            return null;
+        }
         Skill skill = new Skill();
         skill.setSkillId(dto.getSkillId());
         skill.setName(dto.getName());
