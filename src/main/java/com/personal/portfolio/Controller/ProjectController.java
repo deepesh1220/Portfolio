@@ -5,7 +5,6 @@ import com.personal.portfolio.Dto.SkillDTO;
 import com.personal.portfolio.Exception.ResourceNotFoundException;
 import com.personal.portfolio.Response.BaseResponse;
 import com.personal.portfolio.Service.ProjectService;
-import com.personal.portfolio.Auth.Service.UserDetailsServiceImpl;
 import com.personal.portfolio.Auth.Security.Jwt.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +28,6 @@ public class ProjectController extends BaseController{
     @Autowired
     private JwtUtil jwtUtil;
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
 
     private final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
@@ -127,7 +124,7 @@ public class ProjectController extends BaseController{
     }
 
 
-    @PostMapping("/add-skill")
+    @PostMapping("/skill")
     public ResponseEntity<BaseResponse<SkillDTO>> addSkill(@RequestBody SkillDTO skillDTO, Authentication authentication) {
         try {
             SkillDTO createdSkill = projectService.addSkill(skillDTO);
@@ -142,6 +139,32 @@ public class ProjectController extends BaseController{
                     ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null),
                     authentication,
                     "Add Skill API failed"
+            );
+        }
+    }
+
+    @GetMapping("/skill/{userId}")
+    public ResponseEntity<BaseResponse<List<SkillDTO>>> getAllSkillsByUser(@PathVariable Long userId, Authentication authentication){
+        try{
+            List<SkillDTO> skillList = projectService.getAllSkillsByUser(userId);
+            return withNewAccessToken(
+                    ResponseEntity.status(HttpStatus.OK).body(skillList),
+                    authentication,
+                    "Skills retrieved successfully"
+            );
+        }catch (ResourceNotFoundException e) {
+            logger.error("Skill not found: {}", e.getMessage());
+            return withNewAccessToken(
+                    ResponseEntity.status(HttpStatus.NOT_FOUND).body(null),
+                    authentication,
+                    e.getMessage()
+            );
+        } catch (Exception e) {
+            logger.error("Failed to skill load: {}", e.getMessage(), e);
+            return withNewAccessToken(
+                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null),
+                    authentication,
+                    "Get Skills API failed"
             );
         }
     }
