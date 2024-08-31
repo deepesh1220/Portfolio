@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EducationServiceImpl implements EducationService {
@@ -75,5 +77,18 @@ public class EducationServiceImpl implements EducationService {
             logger.error("Failed to remove education entry: {}", e.getMessage(), e);
             throw new RuntimeException("An unexpected error occurred while removing the education entry.", e);
         }
+    }
+
+    @Override
+    public List<EducationDTO> getAllEducationByUserId(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ResourceNotFoundException("User not found with ","id: " , userId);
+        }
+
+        List<Education> educations = educationRepository.findAllByUserId(userId);
+
+        return educations.stream()
+                .map(EducationMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

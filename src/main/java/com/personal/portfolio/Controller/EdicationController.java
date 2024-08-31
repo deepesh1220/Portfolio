@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 public class EdicationController extends BaseController{
@@ -103,5 +105,30 @@ public class EdicationController extends BaseController{
             }
         }
 
+    @GetMapping("/edu/all")
+    public ResponseEntity<BaseResponse<List<EducationDTO>>> getAllEducationByUserId(@RequestParam Long userId, Authentication authentication) {
+        try {
+            List<EducationDTO> educationList = educationService.getAllEducationByUserId(userId);
+            return withNewAccessToken(
+                    ResponseEntity.status(HttpStatus.OK).body(educationList),
+                    authentication,
+                    "Fetched all education entries successfully"
+            );
+        } catch (ResourceNotFoundException e) {
+            logger.error("User not found: {}", e.getMessage());
+            return withNewAccessToken(
+                    ResponseEntity.status(HttpStatus.NOT_FOUND).body(null),
+                    authentication,
+                    e.getMessage()
+            );
+        } catch (Exception e) {
+            logger.error("Failed to fetch education entries: {}", e.getMessage(), e);
+            return withNewAccessToken(
+                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null),
+                    authentication,
+                    "Education Fetch API failed"
+            );
+        }
+    }
 
     }
