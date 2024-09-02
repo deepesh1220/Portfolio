@@ -82,13 +82,23 @@ public class EducationServiceImpl implements EducationService {
     @Override
     public List<EducationDTO> getAllEducationByUserId(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new ResourceNotFoundException("User not found with ","id: " , userId);
+            throw new ResourceNotFoundException("User ","ID: " , userId);
         }
-
-        List<Education> educations = educationRepository.findAllByUserId(userId);
+        Users users = userRepository.findById(userId).get();
+        List<Education> educations = educationRepository.findAllByUser(users);
 
         return educations.stream()
                 .map(EducationMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public EducationDTO getEducationById(Long eduId) {
+        // Fetch the education entry by its ID or throw an exception if not found
+        Education education = educationRepository.findById(eduId)
+                .orElseThrow(() -> new ResourceNotFoundException("Education ", "ID", eduId));
+
+        // Convert the education entity to a DTO and return it
+        return EducationMapper.toDTO(education);
     }
 }

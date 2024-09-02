@@ -15,4 +15,6 @@ public interface EducationService {
     void removeEducationById(Long eduId);
 
     List<EducationDTO> getAllEducationByUserId(Long userId);
+
+    EducationDTO getEducationById(Long eduId);
 }

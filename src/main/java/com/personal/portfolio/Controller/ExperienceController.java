@@ -1,14 +1,15 @@
 package com.personal.portfolio.Controller;
 
-import com.personal.portfolio.Dto.EducationDTO;
-import com.personal.portfolio.Dto.ProjectDTO;
+import com.personal.portfolio.Dto.ContactDTO;
+import com.personal.portfolio.Dto.ExperienceDTO;
 import com.personal.portfolio.Exception.ResourceNotFoundException;
 import com.personal.portfolio.Response.BaseResponse;
-import com.personal.portfolio.Service.EducationService;
+import com.personal.portfolio.Service.ExperienceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -16,102 +17,78 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/edu")
-public class EdicationController extends BaseController {
+@RequestMapping("/api/exp")
+public class ExperienceController extends BaseController{
 
 
     @Autowired
-    EducationService educationService;
+    ExperienceService experienceService;
 
-    private final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
+    private final Logger logger = LoggerFactory.getLogger(ExperienceController.class);
 
     @PostMapping("/{userId}")
-    public ResponseEntity<BaseResponse<EducationDTO>> addEducation(@PathVariable Long userId, @RequestBody EducationDTO educationDTO, Authentication authentication) {
-        try {
-            EducationDTO response = educationService.addEducation(userId, educationDTO);
+    public ResponseEntity<BaseResponse<ExperienceDTO>> addExperience(@PathVariable Long userId, @RequestBody ExperienceDTO experienceDTO, Authentication authentication){
+        try{
+            ExperienceDTO response = experienceService.addExperience(userId, experienceDTO);
             return withNewAccessToken(
                     ResponseEntity.status(HttpStatus.CREATED).body(response),
                     authentication,
-                    "Education added successfully"
+                    "Experience added successfully"
             );
-        } catch (ResourceNotFoundException e) {
+        }catch (ResourceNotFoundException e){
             logger.error("User not found: {}", e.getMessage());
             return withNewAccessToken(
                     ResponseEntity.status(HttpStatus.NOT_FOUND).body(null),
                     authentication,
                     e.getMessage()
             );
-        } catch (Exception e) {
-            logger.error("Failed to add education: {}", e.getMessage(), e);
+        }catch (Exception e) {
+            logger.error("Failed to add contact: {}", e.getMessage(), e);
             return withNewAccessToken(
                     ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null),
                     authentication,
-                    "Education Add API failed"
+                    "Experience Add API failed"
             );
         }
     }
 
-    @PutMapping("/{eduId}")
-    public ResponseEntity<BaseResponse<EducationDTO>> updateEducationById(@PathVariable Long eduId, @RequestBody EducationDTO educationDTO, Authentication authentication) {
+    // Update an existing contact
+    @PutMapping("/{expId}")
+    public ResponseEntity<BaseResponse<ExperienceDTO>> updateExperienceById(@PathVariable Long expId, @RequestBody ExperienceDTO experienceDTO, Authentication authentication) {
         try {
-            EducationDTO response = educationService.updateEducationById(eduId, educationDTO);
+            ExperienceDTO response = experienceService.updateExperienceById(expId, experienceDTO);
             return withNewAccessToken(
                     ResponseEntity.status(HttpStatus.ACCEPTED).body(response),
                     authentication,
-                    "Education updated successfully"
+                    "Experience updated successfully"
             );
         } catch (ResourceNotFoundException e) {
-            logger.error("Those Perticuler Education not found for update: {}", e.getMessage());
+            logger.error("Experience not found for update: {}", e.getMessage());
             return withNewAccessToken(
                     ResponseEntity.status(HttpStatus.NOT_FOUND).body(null),
                     authentication,
                     e.getMessage()
             );
         } catch (Exception e) {
-            logger.error("Failed to update education: {}", e.getMessage(), e);
+            logger.error("Failed to update experience: {}", e.getMessage(), e);
             return withNewAccessToken(
                     ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null),
                     authentication,
-                    "Education Update API failed"
+                    "Experience Update API failed"
             );
         }
     }
 
-    @DeleteMapping("/{eduId}")
-    public ResponseEntity<BaseResponse<Void>> removeEducationById(@PathVariable Long eduId, Authentication authentication) {
-        try {
-            educationService.removeEducationById(eduId);
-            return withNewAccessToken(
-                    ResponseEntity.status(HttpStatus.OK).body(null),
-                    authentication,
-                    "Education removed successfully"
-            );
-        } catch (ResourceNotFoundException e) {
-            logger.error("Education not found for removal: {}", e.getMessage());
-            return withNewAccessToken(
-                    ResponseEntity.status(HttpStatus.NOT_FOUND).body(null),
-                    authentication,
-                    e.getMessage()
-            );
-        } catch (Exception e) {
-            logger.error("Failed to remove education: {}", e.getMessage(), e);
-            return withNewAccessToken(
-                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null),
-                    authentication,
-                    "Education Remove API failed"
-            );
-        }
-    }
-
+    // Get all contacts by user ID
     @GetMapping("/all/{userId}")
-    public ResponseEntity<BaseResponse<List<EducationDTO>>> getAllEducationByUserId(@PathVariable Long userId, Authentication authentication) {
+    public ResponseEntity<BaseResponse<List<ExperienceDTO>>> getAllExperiencesByUserId(@PathVariable Long userId, Authentication authentication) {
         try {
-            List<EducationDTO> educationList = educationService.getAllEducationByUserId(userId);
+            List<ExperienceDTO> experienceList = experienceService.getAllExperiencesByUserId(userId);
             return withNewAccessToken(
-                    ResponseEntity.status(HttpStatus.OK).body(educationList),
+                    ResponseEntity.status(HttpStatus.OK).body(experienceList),
                     authentication,
-                    "Fetched all education entries successfully"
+                    "Fetched all experience successfully"
             );
         } catch (ResourceNotFoundException e) {
             logger.error("User not found: {}", e.getMessage());
@@ -121,40 +98,66 @@ public class EdicationController extends BaseController {
                     e.getMessage()
             );
         } catch (Exception e) {
-            logger.error("Failed to fetch education entries: {}", e.getMessage(), e);
+            logger.error("Failed to fetch contacts: {}", e.getMessage(), e);
             return withNewAccessToken(
                     ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null),
                     authentication,
-                    "Education Fetch API failed"
+                    "Experience Fetch API failed"
             );
         }
     }
 
-
-    @GetMapping("/{eduId}")
-    public ResponseEntity<BaseResponse<EducationDTO>> getEducationById(@PathVariable Long eduId, Authentication authentication) {
+    // Remove a contact by ID
+    @DeleteMapping("/{expId}")
+    public ResponseEntity<BaseResponse<Void>> removeExperienceById(@PathVariable Long expId, Authentication authentication) {
         try {
-            EducationDTO educationDTO = educationService.getEducationById(eduId);
+            experienceService.removeExperienceById(expId);
             return withNewAccessToken(
-                    ResponseEntity.status(HttpStatus.OK).body(educationDTO),
+                    ResponseEntity.status(HttpStatus.OK).body(null),
                     authentication,
-                    "Fetched education entry successfully"
+                    "Experience removed successfully"
             );
         } catch (ResourceNotFoundException e) {
-            logger.error("Education not found: {}", e.getMessage());
+            logger.error("Experience not found for removal: {}", e.getMessage());
             return withNewAccessToken(
                     ResponseEntity.status(HttpStatus.NOT_FOUND).body(null),
                     authentication,
                     e.getMessage()
             );
         } catch (Exception e) {
-            logger.error("Failed to fetch education entry: {}", e.getMessage(), e);
+            logger.error("Failed to remove experience: {}", e.getMessage(), e);
             return withNewAccessToken(
                     ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null),
                     authentication,
-                    "Education Fetch API failed"
+                    "Experience Remove API failed"
             );
         }
     }
 
+    // Get a contact by contact ID
+    @GetMapping("/{expId}")
+    public ResponseEntity<BaseResponse<ExperienceDTO>> getExperienceById(@PathVariable Long expId, Authentication authentication) {
+        try {
+            ExperienceDTO response = experienceService.getExperienceById(expId);
+            return withNewAccessToken(
+                    ResponseEntity.status(HttpStatus.OK).body(response),
+                    authentication,
+                    "Fetched experience successfully"
+            );
+        } catch (ResourceNotFoundException e) {
+            logger.error("Experience not found: {}", e.getMessage());
+            return withNewAccessToken(
+                    ResponseEntity.status(HttpStatus.NOT_FOUND).body(null),
+                    authentication,
+                    e.getMessage()
+            );
+        } catch (Exception e) {
+            logger.error("Failed to fetch experience: {}", e.getMessage(), e);
+            return withNewAccessToken(
+                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null),
+                    authentication,
+                    "Experience Fetch API failed"
+            );
+        }
+    }
 }
