@@ -73,3 +73,6 @@ Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: The connection wa
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:690)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
 	... 16 more
+2024-09-03 12:06:12.936175+05:30 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "DESCRIPTION CHARACTER VARYING(255)": "'* Worked on the CGMMSSY website and ensuring optimal user experience and Live d... (325)"; SQL statement:
+insert into experience (company_name,description,end_date,position,start_date,user_id,experience_id) values (?,?,?,?,?,?,default) [22001-224]
