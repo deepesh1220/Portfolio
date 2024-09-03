@@ -29,3 +29,6 @@ SELECT * SKILL [42000-224]
 2024-08-22 15:00:43.780260+05:30 jdbc[13]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]PROJECT"; expected "PREPARE"; SQL statement:
 PROJECT [42001-224]
+2024-09-03 15:48:48.623677+05:30 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]CERTIFICATION"; expected "COMMIT, CREATE, CALL, CHECKPOINT, COMMENT"; SQL statement:
+CERTIFICATION [42001-224]
