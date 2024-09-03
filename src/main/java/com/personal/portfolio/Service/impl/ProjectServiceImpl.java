@@ -16,9 +16,8 @@ import com.personal.portfolio.Service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -105,6 +104,33 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDTO updateProjectById(Long projectId, ProjectDTO projectDTO) {
-        return null;
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project", "ID", projectId));
+        project.setTitle(projectDTO.getTitle());
+        project.setDescription(projectDTO.getDescription());
+        project.setStartDate(projectDTO.getStartDate());
+        project.setEndDate(projectDTO.getEndDate());
+        project.setRepositoryUrl(projectDTO.getRepositoryUrl());
+        project.setProjectUrl(projectDTO.getProjectUrl());
+
+        Project updateProject = projectRepository.saveAndFlush(project);
+        return ProjectMapper.toDTO(updateProject);
+
+    }
+
+    @Override
+    public List<SkillDTO> getAllSkillsByUser(Long userId) {
+        Set<SkillDTO> skillDTOList = new HashSet<>();
+        List<Project> projects = userRepository.findById(userId).get().getProjects();
+        List<Skill> skills = new ArrayList<>();
+        if(projects == null){
+            return new ArrayList<>();
+        }
+        for (Project p: projects) {
+            for(Skill s: p.getSkills()){
+                skillDTOList.add(SkillMapper.toDTO(s));
+            }
+        }
+        return skillDTOList.stream().collect(Collectors.toList());
     }
 }
