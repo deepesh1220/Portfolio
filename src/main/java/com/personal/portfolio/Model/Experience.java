@@ -28,6 +28,8 @@ public class Experience {
     private String position;
     private Date startDate;
     private Date endDate;
+
+    @Lob
     private String description;
 
 }

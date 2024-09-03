@@ -17,4 +17,6 @@ public interface ProjectService {
     SkillDTO addSkill(SkillDTO skillDTO);
 
     ProjectDTO updateProjectById(Long projectId, ProjectDTO projectDTO);
+
+    List<SkillDTO> getAllSkillsByUser(Long userId);
 }
