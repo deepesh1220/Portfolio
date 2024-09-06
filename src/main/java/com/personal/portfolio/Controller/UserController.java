@@ -6,6 +6,9 @@ import com.personal.portfolio.Dto.UserDTO;
 import com.personal.portfolio.Auth.Service.RefreshTokenService;
 import com.personal.portfolio.Response.BaseResponse;
 import com.personal.portfolio.Service.UsersService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,6 +38,12 @@ public class UserController extends BaseController {
 
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
+
+    @Operation(summary = "Retrieve user details", description = "Fetches the details of the authenticated user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User details retrieved successfully"),
+            @ApiResponse(responseCode = "500", description = "Error occurred while retrieving user details")
+    })
     @GetMapping("/user")
     public ResponseEntity<BaseResponse<UserDTO>> getUserDetails(Authentication authentication) {
         try {
@@ -55,6 +64,13 @@ public class UserController extends BaseController {
         }
     }
 
+
+
+    @Operation(summary = "Get user by ID", description = "Fetches the details of a user by their ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
+            @ApiResponse(responseCode = "500", description = "Error occurred while retrieving user by ID")
+    })
     @GetMapping("/user/{id}")
     public ResponseEntity<BaseResponse<UserDTO>> getUserById(@PathVariable long id, Authentication authentication) {
         try {
@@ -74,6 +90,12 @@ public class UserController extends BaseController {
         }
     }
 
+
+    @Operation(summary = "Delete user by ID", description = "Deletes a user by their ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User deleted successfully"),
+            @ApiResponse(responseCode = "500", description = "Error occurred while deleting user")
+    })
     @DeleteMapping("/user/{id}")
     public ResponseEntity<BaseResponse<String>> deleteUserById(@PathVariable long id, Authentication authentication) {
         try {

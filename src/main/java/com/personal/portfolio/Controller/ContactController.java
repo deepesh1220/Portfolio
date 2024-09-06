@@ -5,6 +5,11 @@ import com.personal.portfolio.Dto.ContactDTO;
 import com.personal.portfolio.Exception.ResourceNotFoundException;
 import com.personal.portfolio.Response.BaseResponse;
 import com.personal.portfolio.Service.ContactService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +31,13 @@ public class ContactController extends BaseController{
     private final Logger logger = LoggerFactory.getLogger(ContactController.class);
 
     // Add a new contact
+
+    @Operation(summary = "Add a new contact", description = "Add a new contact for a specified user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Contact added successfully", content = @Content(schema = @Schema(implementation = ContactDTO.class))),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Contact Add API failed", content = @Content)
+    })
     @PostMapping("/{userId}")
     public ResponseEntity<BaseResponse<ContactDTO>> addContact(@PathVariable Long userId, @RequestBody ContactDTO contactDTO, Authentication authentication) {
         try {
@@ -53,6 +65,12 @@ public class ContactController extends BaseController{
     }
 
     // Update an existing contact
+    @Operation(summary = "Update an existing contact", description = "Update a contact by contact ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Contact updated successfully", content = @Content(schema = @Schema(implementation = ContactDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Contact not found for update", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Contact Update API failed", content = @Content)
+    })
     @PutMapping("/{contactId}")
     public ResponseEntity<BaseResponse<ContactDTO>> updateContactById(@PathVariable Long contactId, @RequestBody ContactDTO contactDTO, Authentication authentication) {
         try {
@@ -80,6 +98,12 @@ public class ContactController extends BaseController{
     }
 
     // Get all contacts by user ID
+    @Operation(summary = "Get all contacts by user ID", description = "Retrieve all contacts associated with a specific user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched all contacts successfully", content = @Content(schema = @Schema(implementation = ContactDTO.class))),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Contact Fetch API failed", content = @Content)
+    })
     @GetMapping("/all/{userId}")
     public ResponseEntity<BaseResponse<List<ContactDTO>>> getAllContactsByUserId(@PathVariable Long userId, Authentication authentication) {
         try {
@@ -107,6 +131,12 @@ public class ContactController extends BaseController{
     }
 
     // Remove a contact by ID
+    @Operation(summary = "Remove a contact by ID", description = "Remove a specific contact by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contact removed successfully", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Contact not found for removal", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Contact Remove API failed", content = @Content)
+    })
     @DeleteMapping("/{contactId}")
     public ResponseEntity<BaseResponse<Void>> removeContactById(@PathVariable Long contactId, Authentication authentication) {
         try {
@@ -134,6 +164,12 @@ public class ContactController extends BaseController{
     }
 
     // Get a contact by contact ID
+    @Operation(summary = "Get a contact by contact ID", description = "Retrieve a specific contact by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched contact successfully", content = @Content(schema = @Schema(implementation = ContactDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Contact not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Contact Fetch API failed", content = @Content)
+    })
     @GetMapping("/{contactId}")
     public ResponseEntity<BaseResponse<ContactDTO>> getContactById(@PathVariable Long contactId, Authentication authentication) {
         try {

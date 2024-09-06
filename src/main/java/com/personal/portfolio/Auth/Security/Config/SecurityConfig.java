@@ -39,8 +39,9 @@ public class SecurityConfig {
             "/api/register",
             "/actuator/**",
             "/h2-console/**",
-            "/swagger-resources/**",
-            "/swagger-ui/**",
+            "/swagger-ui.html",          // For Swagger 2.x
+            "/swagger-ui/**",            // For Swagger UI static resources
+            "/v3/api-docs/**",           // For Springdoc OpenAPI
             "/webjars/**"
     };
 

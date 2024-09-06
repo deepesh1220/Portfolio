@@ -5,6 +5,11 @@ import com.personal.portfolio.Dto.ExperienceDTO;
 import com.personal.portfolio.Exception.ResourceNotFoundException;
 import com.personal.portfolio.Response.BaseResponse;
 import com.personal.portfolio.Service.ExperienceService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +32,16 @@ public class ExperienceController extends BaseController{
 
     private final Logger logger = LoggerFactory.getLogger(ExperienceController.class);
 
+
+    @Operation(summary = "Add Experience", description = "Add a new experience for a user", tags = { "Experience API" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Experience added successfully",
+                    content = @Content(schema = @Schema(implementation = ExperienceDTO.class))),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content)
+    })
     @PostMapping("/{userId}")
     public ResponseEntity<BaseResponse<ExperienceDTO>> addExperience(@PathVariable Long userId, @RequestBody ExperienceDTO experienceDTO, Authentication authentication){
         try{
@@ -53,7 +68,18 @@ public class ExperienceController extends BaseController{
         }
     }
 
+
+
     // Update an existing contact
+    @Operation(summary = "Update Experience", description = "Update an existing experience by ID", tags = { "Experience API" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Experience updated successfully",
+                    content = @Content(schema = @Schema(implementation = ExperienceDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Experience not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content)
+    })
     @PutMapping("/{expId}")
     public ResponseEntity<BaseResponse<ExperienceDTO>> updateExperienceById(@PathVariable Long expId, @RequestBody ExperienceDTO experienceDTO, Authentication authentication) {
         try {
@@ -81,6 +107,15 @@ public class ExperienceController extends BaseController{
     }
 
     // Get all contacts by user ID
+    @Operation(summary = "Get All Experiences by User ID", description = "Retrieve all experiences for a specific user", tags = { "Experience API" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched all experiences successfully",
+                    content = @Content(schema = @Schema(implementation = ExperienceDTO.class))),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content)
+    })
     @GetMapping("/all/{userId}")
     public ResponseEntity<BaseResponse<List<ExperienceDTO>>> getAllExperiencesByUserId(@PathVariable Long userId, Authentication authentication) {
         try {
@@ -108,6 +143,15 @@ public class ExperienceController extends BaseController{
     }
 
     // Remove a contact by ID
+    @Operation(summary = "Remove Experience by ID", description = "Remove an experience by its ID", tags = { "Experience API" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Experience removed successfully",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Experience not found for removal",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content)
+    })
     @DeleteMapping("/{expId}")
     public ResponseEntity<BaseResponse<Void>> removeExperienceById(@PathVariable Long expId, Authentication authentication) {
         try {
@@ -135,6 +179,15 @@ public class ExperienceController extends BaseController{
     }
 
     // Get a contact by contact ID
+    @Operation(summary = "Get Experience by ID", description = "Retrieve an experience by its ID", tags = { "Experience API" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched experience successfully",
+                    content = @Content(schema = @Schema(implementation = ExperienceDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Experience not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content)
+    })
     @GetMapping("/{expId}")
     public ResponseEntity<BaseResponse<ExperienceDTO>> getExperienceById(@PathVariable Long expId, Authentication authentication) {
         try {

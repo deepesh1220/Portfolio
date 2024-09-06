@@ -13,6 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // Do not annotate this class with @Component or @Controller
+/**
+ * Abstract base controller providing common functionalities for all controllers.
+ * This class contains utility methods to handle common tasks such as generating
+ * new access tokens and wrapping responses in a standardized format.
+ *
+ * Note: Do not annotate this class with @Component or @Controller.
+ */
 public abstract class BaseController {
 
     @Autowired
@@ -26,6 +33,19 @@ public abstract class BaseController {
 
     private final Logger logger = LoggerFactory.getLogger(BaseController.class);
 
+
+    /**
+     * Wraps a given response in a standardized {@link BaseResponse} format and generates a new access token.
+     *
+     * @param <T> the type of the response body
+     * @param response the original response to be wrapped
+     * @param authentication the current user's authentication object
+     * @param message a custom message to be included in the response
+     * @return a {@link ResponseEntity} with the new access token and a standardized response format
+     * @throws IllegalStateException if the authentication object is null or not an instance of {@link UserDetails},
+     *                               or if required services are not initialized
+     * @throws RuntimeException if there is an error generating the access token
+     */
     protected <T> ResponseEntity<BaseResponse<T>> withNewAccessToken(ResponseEntity<T> response, Authentication authentication, String message) {
         if (authentication == null) {
             logger.error("Authentication object is null");

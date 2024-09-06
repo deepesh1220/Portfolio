@@ -6,6 +6,9 @@ import com.personal.portfolio.Exception.ResourceNotFoundException;
 import com.personal.portfolio.Response.BaseResponse;
 import com.personal.portfolio.Service.ProjectService;
 import com.personal.portfolio.Auth.Security.Jwt.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,12 @@ public class ProjectController extends BaseController{
     private final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
 
+    @Operation(summary = "Add a new project", description = "Add a new project for a specific user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Project added successfully"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/project/{userId}")
     public ResponseEntity<BaseResponse<ProjectDTO>> addProject(@PathVariable Long userId, @RequestBody ProjectDTO projectDTO, Authentication authentication) {
         try {
@@ -58,6 +67,13 @@ public class ProjectController extends BaseController{
         }
     }
 
+
+    @Operation(summary = "Update a project", description = "Update an existing project by project ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Project updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Project not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PutMapping("/project/{projectId}")
     public ResponseEntity<BaseResponse<ProjectDTO>> updateProjectById(@PathVariable Long projectId, @RequestBody ProjectDTO projectDTO, Authentication authentication) {
         try {
@@ -85,6 +101,11 @@ public class ProjectController extends BaseController{
     }
 
 
+    @Operation(summary = "Add skills to a project", description = "Add skills to an existing project by project ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Skill added to project successfully"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/project/skill/{projectId}")
     public ResponseEntity<BaseResponse<SkillDTO>> addSkillsOnProject(@PathVariable Long projectId, @RequestBody SkillDTO skillDTO, Authentication authentication) {
         try {
@@ -104,6 +125,12 @@ public class ProjectController extends BaseController{
         }
     }
 
+
+    @Operation(summary = "Get all projects by user", description = "Retrieve all projects associated with a specific user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Projects retrieved successfully"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/project/all-projects")
     public ResponseEntity<BaseResponse<List<ProjectDTO>>> getAllProjectsByUser(@RequestParam Long userId, Authentication authentication) {
         try {
@@ -124,6 +151,11 @@ public class ProjectController extends BaseController{
     }
 
 
+    @Operation(summary = "Add a new skill", description = "Add a new skill to the system.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Skill added successfully"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/skill")
     public ResponseEntity<BaseResponse<SkillDTO>> addSkill(@RequestBody SkillDTO skillDTO, Authentication authentication) {
         try {
@@ -143,6 +175,13 @@ public class ProjectController extends BaseController{
         }
     }
 
+
+    @Operation(summary = "Get all skills by user", description = "Retrieve all skills associated with a specific user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Skills retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Skill not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/skill/{userId}")
     public ResponseEntity<BaseResponse<List<SkillDTO>>> getAllSkillsByUser(@PathVariable Long userId, Authentication authentication){
         try{

@@ -8,6 +8,9 @@ import com.personal.portfolio.Model.RefreshToken;
 import com.personal.portfolio.Model.Users;
 import com.personal.portfolio.Repository.UserRepository;
 import com.personal.portfolio.Auth.Service.RefreshTokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,25 +61,13 @@ public class AuthController {
         this.userRepository = userRepository;
     }
 
-//    @PostMapping("/login")
-//    public ResponseEntity<?> authenticate(@RequestBody AuthRequest authRequest) throws Exception {
-//        try {
-//            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//        } catch (BadRequestException e) {
-//            logger.error("Authentication failed Ho Gya Check The Password: {}", e.getMessage(), e); // Add logging for debugging
-//            throw new Exception("Incorrect username or password", e);
-////            return new ResponseEntity<>("Incorrect username or password",HttpStatus.BAD_REQUEST);
-//        }
-//
-//        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-//        final String jwt = jwtUtil.generateToken(userDetails);
-//
-//        return ResponseEntity.ok(new AuthResponse(jwt));
-//    }
 
-
+    @Operation(summary = "Authenticate user", description = "Authenticate the user and return an access token and refresh token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication successful"),
+            @ApiResponse(responseCode = "401", description = "Incorrect username or password"),
+            @ApiResponse(responseCode = "500", description = "An error occurred during authentication")
+    })
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody AuthRequest authRequest) throws Exception {
         try {
@@ -118,7 +109,11 @@ public class AuthController {
 
 
 
-
+    @Operation(summary = "Register new user", description = "Registers a new user in the system.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Registration successful"),
+            @ApiResponse(responseCode = "400", description = "Username already exists")
+    })
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody Users user) {
         if (userRepository.findByUsername(user.getUsername()) != null)
@@ -132,6 +127,12 @@ public class AuthController {
     }
 
 
+    @Operation(summary = "Refresh access token", description = "Generates a new access token using the provided refresh token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Access token refreshed successfully"),
+            @ApiResponse(responseCode = "401", description = "Invalid refresh token"),
+            @ApiResponse(responseCode = "403", description = "Refresh token is expired")
+    })
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody AuthRequest authRequest){
         String requestRefreshToken = authRequest.getRefreshToken();
@@ -153,7 +154,10 @@ public class AuthController {
                 .orElseGet(()-> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token"));
     }
 
-
+    @Operation(summary = "Logout user", description = "Logs out the user by invalidating the provided refresh token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logged out successfully")
+    })
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody AuthRequest authRequest){
         refreshTokenService.deleteByToken(authRequest.getRefreshToken());
