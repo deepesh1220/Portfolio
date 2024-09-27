@@ -8,6 +8,8 @@ import com.personal.portfolio.Model.RefreshToken;
 import com.personal.portfolio.Model.Users;
 import com.personal.portfolio.Repository.UserRepository;
 import com.personal.portfolio.Auth.Service.RefreshTokenService;
+import com.personal.portfolio.Service.OtpService;
+import com.personal.portfolio.Service.impl.OtpServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,10 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 import org.slf4j.Logger;
@@ -51,6 +50,9 @@ public class AuthController {
 
     @Autowired
     PasswordEncoder encoder;
+
+    @Autowired
+    OtpService otpService;
 
     private final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -110,10 +112,10 @@ public class AuthController {
 
 
     @Operation(summary = "Register new user", description = "Registers a new user in the system.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Registration successful"),
-            @ApiResponse(responseCode = "400", description = "Username already exists")
-    })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Registration successful"),
+//            @ApiResponse(responseCode = "400", description = "Username already exists")
+//    })
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody Users user) {
         if (userRepository.findByUsername(user.getUsername()) != null)
@@ -164,6 +166,54 @@ public class AuthController {
         return ResponseEntity.ok("Logged out successfully");
     }
 
+
+    @Operation(summary = "Forgot password", description = "Generates an OTP and sends it to the user's registered contact information for password reset.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OTP sent successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid username or user not found")
+    })
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String username) {
+        try {
+            String otp = otpService.generateOtp(username);
+            System.out.println(otp);
+            return ResponseEntity.ok("OTP sent to your registered contact.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Verify OTP", description = "Verifies the OTP provided by the user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OTP verified successfully"),
+            @ApiResponse(responseCode = "401", description = "Invalid or expired OTP")
+    })
+    @PostMapping("/verify-otp")
+    public ResponseEntity<String> verifyOtp(@RequestParam String username, @RequestParam String otp) {
+        boolean isVerified = otpService.verifyOtp(username, otp);
+        if (isVerified) {
+            return ResponseEntity.ok("OTP verified successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired OTP.");
+        }
+    }
+
+    @Operation(summary = "Reset password", description = "Resets the user's password after OTP verification.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Password reset successful"),
+            @ApiResponse(responseCode = "400", description = "Invalid or unverified OTP"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String username, @RequestParam String newPassword) {
+        boolean isPasswordUpdated = otpService.updatePassword(username, newPassword);
+        System.out.println("Reset Password response "+isPasswordUpdated);
+        if (isPasswordUpdated) {
+            return ResponseEntity.ok("Password reset successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("OTP not verified or expired.");
+        }
+    }
 
 }
 

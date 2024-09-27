@@ -24,6 +24,7 @@ public class Users implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+
     private String username;
     private String name;
     private String email;
@@ -48,6 +49,9 @@ public class Users implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshToken> refreshTokens;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<OtpVerification> otpVerificationList;
 
 
     @Override
