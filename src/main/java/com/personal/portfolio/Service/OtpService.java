@@ -9,7 +9,6 @@ public interface OtpService {
 
     boolean verifyOtp(String username, String otp);
 
-    void clearOtpsForUser(Users user);
 
     boolean updatePassword(String username, String newPassword);
 }

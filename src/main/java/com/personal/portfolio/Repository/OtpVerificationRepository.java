@@ -15,8 +15,6 @@ public interface OtpVerificationRepository extends JpaRepository<OtpVerification
     Optional<OtpVerification> findByOtpAndUser(String otp, Users user);
 
 
-    void deleteByUser(Users user);
-
     // Native query to get the most recent verified OTP
     @Query(value = "SELECT * FROM otp_verification o WHERE o.user_id = :userId AND o.is_verified = true ORDER BY o.expiration_time DESC LIMIT 1", nativeQuery = true)
     Optional<OtpVerification> findTopByUserAndIsVerifiedTrue(@Param("userId") Long userId);
@@ -25,4 +23,6 @@ public interface OtpVerificationRepository extends JpaRepository<OtpVerification
 
 
     List<OtpVerification> findByUser(Users user);
+
+    void deleteByUser(Users user);
 }

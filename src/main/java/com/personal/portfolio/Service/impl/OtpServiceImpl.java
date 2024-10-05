@@ -11,6 +11,7 @@ import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -77,12 +78,16 @@ public class OtpServiceImpl implements OtpService {
         return true;
     }
 
-    public void clearOtpsForUser(Users user) {
-        otpVerificationRepository.deleteByUser(user);
-    }
+
+
+//    public void clearOtpsForUser(Users user) {
+//        otpVerificationRepository.deleteByUser(user);
+//    }
+
 
 
     // Method to update the user's password after OTP verification
+    @Transactional
     public boolean updatePassword(String username, String newPassword) {
         // Fetch the user entity from the database using the username
         Users user = userRepository.findByUsername(username);
@@ -106,7 +111,9 @@ public class OtpServiceImpl implements OtpService {
         userRepository.save(user); // Save the updated user entity
         System.out.println("New Password is updated");
         // Clear OTPs for the user once the password is updated
-        clearOtpsForUser(user);
+        otpVerificationRepository.deleteByUser(user);
+        System.out.println("Deleted otp");
+//        remove OTPs for user
 
         return true;
     }
