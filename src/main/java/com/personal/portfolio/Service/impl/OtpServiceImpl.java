@@ -1,17 +1,21 @@
 package com.personal.portfolio.Service.impl;
 
-import com.personal.portfolio.Dto.UserDTO;
-import com.personal.portfolio.Mapper.UserMapper;
+import com.personal.portfolio.Controller.CertificationController;
 import com.personal.portfolio.Model.OtpVerification;
 import com.personal.portfolio.Model.Users;
 import com.personal.portfolio.Repository.OtpVerificationRepository;
 import com.personal.portfolio.Repository.UserRepository;
+import com.personal.portfolio.Service.EmailService;
 import com.personal.portfolio.Service.OtpService;
+import jakarta.mail.MessagingException;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +34,10 @@ public class OtpServiceImpl implements OtpService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    EmailService emailService;
+
+    private final Logger logger = LoggerFactory.getLogger(CertificationController.class);
 
     public String generateOtp(String username) {
         Users user = userRepository.findByUsername(username);
@@ -40,15 +48,30 @@ public class OtpServiceImpl implements OtpService {
         // Generate random 6-digit OTP
         String otp = String.format("%06d", new Random().nextInt(999999));
 
+        // Encrypt the OTP before saving it
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encryptedOtp = passwordEncoder.encode(otp);
+
         // Set expiration time for the OTP (e.g., 1 minutes)
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(5);
 
         // Create OtpVerification entity
-        OtpVerification otpVerification = new OtpVerification(otp, expirationTime, user);
+        OtpVerification otpVerification = new OtpVerification(encryptedOtp, expirationTime, user);
         otpVerificationRepository.save(otpVerification);
 
         // Here, you can add logic to send the OTP to the user via email or SMS
-        System.out.println(otp);
+        try {
+
+            String body = "Dear "+ user.getName()+", Your forget password OTP code is: " + otp + " This code is valid for 5 minutes.";
+            String subject = "Forget Password OTP";
+            String email = user.getEmail();
+
+            emailService.sendEmail(email, subject, body);
+        }catch (Exception e){
+            logger.error("Email Problem: {}", e);
+            System.out.println("Email Problem");
+        }
+        System.out.println("Generated OTP: "+otp);
 
         return otp;
     }
@@ -59,16 +82,22 @@ public class OtpServiceImpl implements OtpService {
             throw new IllegalArgumentException("User not found");
         }
 
-        Optional<OtpVerification> otpVerificationOptional = otpVerificationRepository.findByOtpAndUser(otp, user);
+//        Optional<OtpVerification> otpVerificationOptional = otpVerificationRepository.findByOtpAndUser(otp, user);
+        Optional<OtpVerification> otpVerificationOptional = otpVerificationRepository.findTopByUserAndIsVerifiedFalse(user);
 
         if (otpVerificationOptional.isEmpty()) {
-            return false; // OTP not found or invalid
+            return false; // OTP not found or already verified
         }
 
         OtpVerification otpVerification = otpVerificationOptional.get();
 
         if (otpVerification.getIsVerified() || otpVerification.getExpirationTime().isBefore(LocalDateTime.now())) {
             return false; // OTP already used or expired
+        }
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (!passwordEncoder.matches(otp, otpVerification.getOtp())) {
+            return false; // OTP mismatch
         }
 
         // Mark the OTP as verified
@@ -80,9 +109,9 @@ public class OtpServiceImpl implements OtpService {
 
 
 
-//    public void clearOtpsForUser(Users user) {
-//        otpVerificationRepository.deleteByUser(user);
-//    }
+    public void clearOtpsForUser(Users user) {
+        otpVerificationRepository.deleteByUser(user);
+    }
 
 
 
@@ -111,7 +140,8 @@ public class OtpServiceImpl implements OtpService {
         userRepository.save(user); // Save the updated user entity
         System.out.println("New Password is updated");
         // Clear OTPs for the user once the password is updated
-        otpVerificationRepository.deleteByUser(user);
+//        otpVerificationRepository.deleteByUser(user);
+        clearOtpsForUser(user);
         System.out.println("Deleted otp");
 //        remove OTPs for user
 

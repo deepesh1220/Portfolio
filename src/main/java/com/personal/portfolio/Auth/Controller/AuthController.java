@@ -8,6 +8,7 @@ import com.personal.portfolio.Model.RefreshToken;
 import com.personal.portfolio.Model.Users;
 import com.personal.portfolio.Repository.UserRepository;
 import com.personal.portfolio.Auth.Service.RefreshTokenService;
+import com.personal.portfolio.Service.EmailService;
 import com.personal.portfolio.Service.OtpService;
 import com.personal.portfolio.Service.impl.OtpServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +54,9 @@ public class AuthController {
 
     @Autowired
     OtpService otpService;
+
+    @Autowired
+    EmailService emailService;
 
     private final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -122,9 +126,15 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Username already exists");
 
         // You may want to hash the password before saving to the database
-         user.setPassword(encoder.encode(user.getPassword()));
+        user.setPassword(encoder.encode(user.getPassword()));
 
         userRepository.save(user);
+
+        String body = "Dear " + user.getName() + ",\\n\\nYour Registration is successful.";
+        String subject = "Portfolio website registration";
+        String email = user.getEmail();
+        emailService.sendEmail(email,subject,body);
+
         return ResponseEntity.ok("Registration successful");
     }
 
